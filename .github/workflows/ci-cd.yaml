@@ -1,0 +1,26 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - main #or any other branch you want to deploy from
+    paths-ignore:
+      - ".github/**"
+
+jobs:
+  deploy:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout the current repository
+        uses: actions/checkout@v4
+      - name: Push to main environment
+        run: npx ggt push --app=gadget-multiplayer --env=main --force --allow-unknown-directory
+        env:
+          GGT_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Deploy to Gadget Production
+        uses: gadget-inc/ggt-deploy-action@v1
+        with:
+          app: "gadget-multiplayer"
+          environment: "main" # Change to the desired environment
+          token: ${{ secrets.DEPLOY_TOKEN }} # Add your CLI token generated from Gadget here
+          allow-issues: "true" # Optionally, continue deployment even if there are issues
